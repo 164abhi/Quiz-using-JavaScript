@@ -1,0 +1,329 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Untitled Document</title>
+<link rel="stylesheet" href="https://bootswatch.com/4/cerulean/bootstrap.css" />
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+</head>
+
+<body>
+<div class="container">
+
+<section id="home">
+<h1 class="mt-4 text-center">Welcome to the <span class="text-danger">Quiz</span></h1>
+<div class="text-center"><button class="btn btn-primary mt-5" onclick="startTest()"><span id="startButon">Start the Quiz</span></button></div>
+</section>
+
+
+<section id="test" data-questionSet="">
+<h2 class="mt-5"><strong>Question <span id="quesNo"></span></strong>: <span id="ques"></span> </h2>
+
+<div id="abc" class="form-group">
+    <div class="custom-control custom-radio">
+      <input type="radio" id="customRadio1" name="customRadio" class="custom-control-input" value="">
+      <label id="opt1" class="custom-control-label" for="customRadio1"></label>
+    </div>
+    <div class="custom-control custom-radio">
+      <input type="radio" id="customRadio2" name="customRadio" class="custom-control-input" value="">
+      <label id="opt2" class="custom-control-label" for="customRadio2"></label>
+    </div>
+    <div class="custom-control custom-radio">
+      <input type="radio" id="customRadio3" name="customRadio" class="custom-control-input" value="">
+      <label id="opt3" class="custom-control-label" for="customRadio3"></label>
+    </div>
+    <div class="custom-control custom-radio">
+      <input type="radio" id="customRadio4" name="customRadio" class="custom-control-input" value="">
+      <label id="opt4" class="custom-control-label" for="customRadio4"></label>
+    </div>
+   	<button id="sbmt" class="btn btn-primary mt-3" onclick="sbmt(getQuestionDataAttributeVal())">Submit Answer</button> 
+	<button id="next" class="btn btn-info mt-3" onclick="nxt(getQuestionDataAttributeVal())" style="display:none">Next Question</button> 
+	<button id="final" class="btn btn-info mt-3" onclick="percentage()" style="display:none">Submit and view Result</button> 
+    </div>
+<div id="message">
+<p id="correct" class="text-success mt-3"></p>
+<p id="incorrect" class="text-danger"></p>
+<p id="mustFill" class="text-secondary"></p>
+<p id="rightAnsIs" class="text-secondary"></p>
+</div>
+</section>
+
+
+<section id="result">
+<h1 class="text-success mt-5" id="pass">Congratulations! You have passed this test.</h1>
+<h1 class="text-danger mt-5 align-items-center justify-content-center" id="fail">Sorry! You have not passed this test.</h1>
+<h1 class="text-secondary mt-5 align-items-center justify-content-center" id="score"></h1>
+</section>
+</div>
+
+</body>
+<script>
+
+var arr = [{ q_no: 1, question: "What is the new name of Feroz Shah Kotla ground?", opt1: "Arun Jaitley Stadium", opt2: "Sheila Dikshit Stadium", opt3: "Gautam Gambhir Stadium", opt4: "Ajit Wadekar Stadium", correct: "Arun Jaitley Stadium" }, { q_no: 2, question: "The India's highest annual rainfall is reported at", opt1: "Namchi, Sikkim", opt2: "Churu, Rajasthan", opt3: "Mawsynram, Meghalaya", opt4: "Chamba, Himachal Pradesh", correct: "Mawsynram, Meghalaya" }, { q_no: 3, question: "The Radcliffe line is a boundary between", opt1: "India and Pakistan", opt2: "India and China", opt3: "India and Myanmar", opt4: "India and Afghanistan", correct: "India and Pakistan" }, { q_no: 4, question: "The state having a largest area of forest cover in India is", opt1: "Arunachal Pradesh", opt2: "Haryana", opt3: "Madhya Pradesh", opt4: "Assam", correct: "Madhya Pradesh" }, { q_no: 5, question: "Light year is a unit of", opt1: "time", opt2: "distance", opt3: "light", opt4: "intensity of light", correct: "distance" }, { q_no: 6, question: "Exposure to sunlight helps a person improve his health because", opt1: "the infrared light kills bacteria in the body", opt2: "resistance power increases", opt3: "the pigment cells in the skin get stimulated and produce a healthy tan", opt4: "the ultraviolet rays convert skin oil into Vitamin D", correct: "the ultraviolet rays convert skin oil into Vitamin D" }, { q_no: 7, question: "The members of the Rajya Sabha are elected by", opt1: "the people", opt2: "Lok Sabha", opt3: "elected members of the legislative assembly", opt4: "elected members of the legislative council", correct: "elected members of the legislative assembly" }, { q_no: 8, question: "The minimum age required to become a member of Rajya Sabha is", opt1: "21 years", opt2: "25 years", opt3: "30 years", opt4: "35 years", correct: "30 years" }, { q_no: 9, question: "Ozone hole refers to", opt1: "hole in ozone layer", opt2: "decrease in the ozone layer in troposphere", opt3: "decrease in thickness of ozone layer in stratosphere", opt4: "increase in the thickness of ozone layer in troposphere", correct: "decrease in thickness of ozone layer in stratosphere" }, { q_no: 10, question: "Plants receive their nutrients mainly from", opt1: "chlorophyll", opt2: "atmosphere", opt3: "light", opt4: "soil", correct: "soil" }];
+
+var userPoints=0; 
+var radioButtons = document.getElementsByName("customRadio");
+
+window.onload = function(){
+	displayHome();
+	$("#startButon").mouseover(function(){					// implementing jQuery
+		$("#startButon").css("font-size", "20px");
+	});
+	$("#startButon").mouseout(function(){
+		$("#startButon").css("font-size", "16px");
+	});
+};
+	
+var currentQ;
+	
+function startTest(){
+	
+    displayTest();
+ 	document.getElementById("quesNo").innerHTML = arr[0].q_no;
+ 	currentQ = arr[0].q_no;
+ 	document.getElementById("ques").innerHTML = arr[0].question;
+    document.getElementById("opt1").innerHTML = arr[0].opt1;
+    document.getElementById("opt2").innerHTML = arr[0].opt2;
+    document.getElementById("opt3").innerHTML = arr[0].opt3;
+    document.getElementById("opt4").innerHTML = arr[0].opt4;
+    document.getElementById("customRadio1").value = arr[0].opt1;
+    document.getElementById("customRadio2").value = arr[0].opt2;
+    document.getElementById("customRadio3").value = arr[0].opt3;
+    document.getElementById("customRadio4").value = arr[0].opt4;
+    setQuestionDataAttributeVal(1);
+}
+	 	
+ 		function sbmt(currentQ){
+ 			var totalQuestions = arr.length;
+ 			if(currentQ == totalQuestions){		// only for last question
+ 				currentQ=parseInt(currentQ);
+ 	 			var currentQuestionIndex=currentQ-1;
+ 	 			
+ 	 			var answer=checkAns(currentQuestionIndex);
+ 	 			if(answer == "blank"){
+ 	                messagePrint("blank");
+ 	 			}
+ 	 			if(answer == "right"){
+ 	                messagePrint("right","finalSubmit");
+ 	 			}
+ 	 			if(answer == "wrong"){
+ 	                messagePrint("wrong","finalSubmit",currentQuestionIndex);
+ 	 			}
+ 			}
+ 			else{		// for rest all questions
+ 				currentQ=parseInt(currentQ);
+ 	 			var currentQuestionIndex=currentQ-1;
+ 	 			
+ 	 			var answer=checkAns(currentQuestionIndex);
+ 	 			if(answer == "blank"){
+ 	                messagePrint("blank");
+ 	 			}
+ 	 			if(answer == "right"){
+ 	                messagePrint("right","sbmt",currentQuestionIndex);
+ 	 			}
+ 	 			if(answer == "wrong"){
+ 	                messagePrint("wrong","sbmt",currentQuestionIndex);
+ 	 			}
+ 			}
+ 		}
+ 		
+ 		function nxt(currentQ){
+            $("#test").hide().fadeIn(1000);
+			changeButton("next");
+			
+ 			currentQ=parseInt(currentQ);
+ 			var nextQuestionIndex=currentQ;
+ 			
+ 			setQuestionData(nextQuestionIndex);
+			setQuestionDataAttributeVal(currentQ+1);
+			
+            clearMessageValues();
+			enableRadio();
+			uncheckRadiobuttons();
+ 		}
+		
+//-------------------------------------------------------------------------------------------------------
+ 		
+ 		
+		// Functions Utility:
+    
+    function displayHome(){
+        document.getElementById("test").style.display="none";
+        document.getElementById("result").style.display="none";
+    }
+    
+    function displayTest(){
+        document.getElementById("home").style.display="none";
+        //document.getElementById("test").style.removeProperty('display');
+        $("#test").fadeIn(1000);					// implementing jQuery
+    }
+    
+    function displayResult(){
+        //document.getElementById("result").style.removeProperty('display');
+        $("#result").fadeIn(3000);					// implementing jQuery
+        document.getElementById("test").style.display="none";
+        var totalQuestions=arr.length;
+        var totalPercentage=(userPoints/totalQuestions)*100;
+        return [totalPercentage,userPoints,totalQuestions];
+    }
+    
+		function getQuestionDataAttributeVal(){
+			var attVal = document.querySelector('#test').getAttribute("data-questionSet");
+			return attVal;
+			}
+		function setQuestionDataAttributeVal(val){
+			document.querySelector('#test').setAttribute("data-questionSet", val);
+			}
+
+		function setQuestionData(index){
+			document.getElementById("quesNo").innerHTML = arr[index].q_no;
+ 		 	document.getElementById("ques").innerHTML = arr[index].question;
+ 		    document.getElementById("opt1").innerHTML = arr[index].opt1;
+ 		    document.getElementById("opt2").innerHTML = arr[index].opt2;
+ 		    document.getElementById("opt3").innerHTML = arr[index].opt3;
+ 		    document.getElementById("opt4").innerHTML = arr[index].opt4;
+ 		    document.getElementById("customRadio1").value = arr[index].opt1;
+ 		    document.getElementById("customRadio2").value = arr[index].opt2;
+ 		    document.getElementById("customRadio3").value = arr[index].opt3;
+ 		    document.getElementById("customRadio4").value = arr[index].opt4;
+		}		
+		
+		function checkAns(currentQuestionIndex){
+			currentQuestionIndex = parseInt(currentQuestionIndex);
+			
+ 			for (var j=0; j<radioButtons.length; j++) {
+ 			  if (radioButtons[j].checked) {
+ 				  var userAnswer = radioButtons[j].value;
+ 			 }
+ 			}
+ 			
+			if(userAnswer == arr[currentQuestionIndex].correct){
+		 	   //alert("Right Answer");
+		 	  userPoints++;
+		 	  return "right";
+                }
+			if(userAnswer == null || userAnswer==""){
+				//alert("you must be select at least a value");
+				return "blank";
+			}	
+		     else{
+		    	 //alert("Wrong Answer");
+		    	 return "wrong"; 
+		     }
+		}
+		
+		function disableRadio(){
+			var radioButtons = document.getElementsByName("customRadio");
+ 			for (var j=0; j<radioButtons.length; j++) {
+ 			  //console.log(radioButtons[j].id);
+ 			 	document.getElementById(radioButtons[j].id).setAttribute("disabled", "");
+ 			}
+		}
+		
+		function enableRadio(){
+			var totalRadio = document.getElementsByName("customRadio");
+			for(var t= 0; t<totalRadio.length;t++){
+				totalRadio[t].removeAttribute("disabled");
+			}
+		}
+			
+		function uncheckRadiobuttons(){
+			for(var y=0; y<radioButtons.length; y++){
+	 		    if(radioButtons[y].checked)
+	 		    	radioButtons[y].checked = false;
+	 		   }
+		}
+    
+        function clearMessageValues(){
+            document.getElementById("mustFill").innerText = "";
+            document.getElementById("correct").innerText = "";
+            document.getElementById("incorrect").innerText = "";
+            document.getElementById("rightAnsIs").innerText = "";
+            }
+    
+        function messagePrint(msgVal, btn, currentQuestionIndex){
+            if(msgVal == "blank"){
+            	//document.getElementById("mustFill").innerText="Value must be filled";
+                $("#mustFill").html("Value must be filled");					// implementing jQuery
+                showHideMessage("blank");
+               }
+            if(msgVal == "right"){
+                document.getElementById("correct").innerText="Right Answer";
+                showHideMessage("right");
+ 				disableRadio();
+                if(btn == "sbmt"){
+                	changeButton("sbmt");
+                }
+                if(btn == "finalSubmit"){
+                	changeButton("finalSubmit");
+                }
+               }
+            if(msgVal == "wrong"){
+                document.getElementById("incorrect").innerText="Sorry! Wrong Answer";
+                document.getElementById("rightAnsIs").innerText="Right answer is: "+arr[currentQuestionIndex].correct;
+                showHideMessage("wrong");
+ 				disableRadio();
+ 				changeButton("sbmt");
+ 				if(btn == "sbmt"){
+                	changeButton("sbmt");
+                }
+                if(btn == "finalSubmit"){
+                	changeButton("finalSubmit");
+                }
+               }
+        }
+    
+        function changeButton(currentButton){
+            //submit to next
+            if(currentButton == "sbmt"){
+                document.getElementById("next").style.display="";
+                document.getElementById("sbmt").style.display="none";
+               }
+            //next to submit
+            if(currentButton == "next"){
+                document.getElementById("sbmt").style.display="";
+                document.getElementById("next").style.display="none";               
+               }
+            //submit to final submit
+            if(currentButton == "finalSubmit"){
+                document.getElementById("final").style.display="";
+                document.getElementById("next").style.display="none";
+                document.getElementById("sbmt").style.display="none";
+            }
+        }
+        
+        function showHideMessage(val){
+            if(val == "blank"){
+                document.getElementById("mustFill").style.display = "";
+                document.getElementById("correct").style.display = "none";
+                document.getElementById("incorrect").style.display = "none";
+                document.getElementById("rightAnsIs").style.display = "none";
+               }
+            if(val == "right"){
+                document.getElementById("correct").style.display = "";
+                document.getElementById("mustFill").style.display = "none";
+                document.getElementById("incorrect").style.display = "none";
+                document.getElementById("rightAnsIs").style.display = "none";
+               }
+            if(val == "wrong"){
+                document.getElementById("incorrect").style.display = "";
+                document.getElementById("mustFill").style.display = "none";
+                document.getElementById("correct").style.display = "none";
+                document.getElementById("rightAnsIs").style.display = "";
+               }
+        }
+        
+        function percentage(){
+			var getPercentage=displayResult();
+            if(getPercentage[0]>=50){
+            	document.getElementById("fail").style.display="none";
+                document.getElementById("score").innerHTML="Your score is: "+getPercentage[1]+" out of "+getPercentage[2];
+            }
+            else{
+            	document.getElementById("pass").style.display="none";
+                document.getElementById("score").innerHTML="Your score is: "+getPercentage[1]+" out of "+getPercentage[2];
+            }
+		}
+    
+</script>
+</html>
